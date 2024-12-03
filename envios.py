@@ -2,7 +2,7 @@ import streamlit as st
 import pandas as pd
 
 # Título de la aplicación
-st.title("Procesador de Archivo .xlsx - Filtrado y Agrupación por Fecha")
+st.title("Procesador de Archivo .xlsx - Costo de Envío por Fecha")
 
 # Subida del archivo .xlsx
 uploaded_file = st.file_uploader("Sube un archivo .xlsx", type="xlsx")
@@ -20,7 +20,7 @@ if uploaded_file is not None:
     st.write("Columnas detectadas:", list(df.columns))
 
     # Validar columnas necesarias
-    required_columns = ["id_venta", "costo_envio", "fecha"]
+    required_columns = ["fecha_venta", "id_venta", "costo_envio"]
     missing_columns = [col for col in required_columns if col not in df.columns]
     if missing_columns:
         st.error(f"Faltan las siguientes columnas requeridas: {missing_columns}")
@@ -33,12 +33,12 @@ if uploaded_file is not None:
         # Convertir 'costo_envio' a numérico
         unique_sales["costo_envio"] = pd.to_numeric(unique_sales["costo_envio"], errors="coerce")
 
-        # Convertir 'fecha' a formato datetime
-        unique_sales["fecha"] = pd.to_datetime(unique_sales["fecha"], errors="coerce", format='%Y-%m-%d')
+        # Convertir 'fecha_venta' a formato datetime
+        unique_sales["fecha_venta"] = pd.to_datetime(unique_sales["fecha_venta"], errors="coerce", format='%Y-%m-%d')
 
-        # Agrupar por fecha y sumar costos de envío
-        grouped_data = unique_sales.groupby(unique_sales["fecha"].dt.date)["costo_envio"].sum().reset_index()
-        grouped_data.columns = ["Fecha", "Costo Total de Envío"]
+        # Agrupar por fecha_venta y sumar costos de envío
+        grouped_data = unique_sales.groupby(unique_sales["fecha_venta"].dt.date)["costo_envio"].sum().reset_index()
+        grouped_data.columns = ["Fecha de Venta", "Costo Total de Envío"]
 
         # Mostrar los datos procesados
         st.subheader("Datos Filtrados y Agrupados por Fecha:")
@@ -49,7 +49,7 @@ if uploaded_file is not None:
         st.download_button(
             label="Descargar CSV Agrupado",
             data=csv,
-            file_name='costos_envio_por_fecha.csv',
+            file_name='costo_envio_por_fecha.csv',
             mime='text/csv'
         )
     except Exception as e:
